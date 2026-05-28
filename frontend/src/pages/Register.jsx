@@ -2,18 +2,28 @@ import React from "react";
 
 import { Link } from "react-router-dom";
 import Input from "../components/input";
-import { useAuth } from "../context/AuthContext";
+
 import { useForm } from "react-hook-form";
-
+import useAuth from "../hooks/useAuth.js";
+import Loading from "../components/Loading.jsx";
 function Register() {
-  const { register: registerUser}  = useAuth();
-  const { register, handleSubmit ,formState:{errors} } = useForm();
+  const { handleRegister, loading } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm();
   const createUser = async (data) => {
-
-    try {
-      const resp = await registerUser(data);
-    } catch (error) {}
+    await handleRegister(data);
+    reset();
   };
+
+  if (loading) {
+   return  <Loading/>
+  
+  }
+
   return (
     <div className="w-full  flex justify-center">
       <div className=" w-1/2  flex flex-col py-26  items-center">
@@ -21,16 +31,19 @@ function Register() {
         <form
           className="flex flex-col gap-6 w-full px-20"
           onSubmit={handleSubmit(createUser)}
-           noValidate
+          noValidate
         >
           <Input
             type={"text"}
             placeholder={"Username"}
             name={"username"}
-            {...register("username", { required: true ,maxLength: 20 })}
-            
+            {...register("username", { required: true, maxLength: 20 })}
           />
-            {errors.username && <span className="text-red-500 text-sm">Username is required and should be less than 20 characters</span>}
+          {errors.username && (
+            <span className="text-red-500 text-sm">
+              Username is required and should be less than 20 characters
+            </span>
+          )}
           <Input
             type={"email"}
             placeholder={"Email"}
@@ -42,17 +55,22 @@ function Register() {
                 message: "Invalid email address",
               },
             })}
-            
           />
-          {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+          {errors.email && (
+            <span className="text-red-500 text-sm">{errors.email.message}</span>
+          )}
           <Input
             type={"password"}
             placeholder={"Password"}
             name={"password"}
             {...register("password", { required: true, minLength: 6 })}
           />
-          {errors.password && <span className="text-red-500 text-sm">Password is required and should be at least 6 characters</span>}
-          <Input 
+          {errors.password && (
+            <span className="text-red-500 text-sm">
+              Password is required and should be at least 6 characters
+            </span>
+          )}
+          <Input
             type={"password"}
             placeholder={"Confirm Password"}
             name={"confirmPassword"}
@@ -62,7 +80,11 @@ function Register() {
                 value === formValues.password || "Passwords do not match",
             })}
           />
-          {errors.confirmPassword && <span className="text-red-500 text-sm">{errors.confirmPassword.message}</span>}
+          {errors.confirmPassword && (
+            <span className="text-red-500 text-sm">
+              {errors.confirmPassword.message}
+            </span>
+          )}
 
           <button
             type="submit"
@@ -76,8 +98,7 @@ function Register() {
           <Link to="/login" className="text-blue-500 hover:underline">
             Login here
           </Link>
-        </p>  
-        
+        </p>
       </div>
     </div>
   );

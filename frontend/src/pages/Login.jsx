@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Input from "../components/input";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
+import {useNavigate} from "react-router-dom";
+import Loading from "../components/Loading";
 
 function Login() {
-  const { login } = useAuth();
+  const { handleLogin, loading } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -22,11 +25,16 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Perform validation and authentication logic here
-    try {
-      const resp = await login(form);
-    } catch (error) {}
+    if (!isValid) return;
+    await handleLogin(form);
+    setForm({ email: "", password: "" });
+    navigate("/");
   };
+
+    if (loading) {
+   return  <Loading/>
+  
+  }
 
   return (
     <div className="w-full h-screen flex">

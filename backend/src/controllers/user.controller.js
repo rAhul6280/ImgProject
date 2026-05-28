@@ -102,4 +102,14 @@ const logoutUser=asyncHandler(async(req,res)=>{
   .json(new ApiResponse(200,{},"Logout successfully"))
 });
 
-export {registerUser, loginUser, logoutUser}
+const getUserData=asyncHandler(async (req,res) => {
+  const userId=req.user._id;
+  const user=await User.findById(userId).select("-password -refreshToken")
+  if(!user){
+    throw new ApiError(401,"Unauthorized Access");
+  }
+  res.status(201)
+  .json(new ApiResponse(200,user,"User fetched Successfully"))
+})
+
+export {registerUser, loginUser, logoutUser,getUserData}
