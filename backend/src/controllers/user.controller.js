@@ -2,6 +2,13 @@ import asyncHandler from "../utils/AsyncHandler.js";
 import { User } from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import jwt from 'jsonwebtoken'
+
+const options={
+    httpOnly:true,
+    secure:true,
+    sameSite:"strict"
+  }
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -40,11 +47,16 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!newUser) {
     throw new ApiError(500, "Failed to create user");
   }
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(newUser._id);
 
-  res.status(201).json(new ApiResponse(201,{
+  res.status(201)
+  .cookie("accessToken",accessToken,options)
+  .cookie("refreshToken",refreshToken,options)
+  .json(new ApiResponse(201,{
     _id: newUser._id,
     name: newUser.name,
     email: newUser.email,
+    avatar:newUser.avatar
   },"User registered successfully"));
 });
 
@@ -72,10 +84,7 @@ const loginUser = asyncHandler(async(req,res)=>{
   const {accessToken,refreshToken}= await generateAccessAndRefreshTokens(user._id);
   
   const loggedInUser= await User.findById(user._id).select("-password -refreshToken");
-  const options={
-    httpOnly:true,
-    secure:true
-  }
+  
 
   res.status(200)
   .cookie("accessToken",accessToken,options)
@@ -112,4 +121,31 @@ const getUserData=asyncHandler(async (req,res) => {
   .json(new ApiResponse(200,user,"User fetched Successfully"))
 })
 
-export {registerUser, loginUser, logoutUser,getUserData}
+const refreshToken=asyncHandler(async(req,res)=>{
+  const token= req.cookies?.refreshToken ||req.body?.refreshToken;
+  if(!token){
+    throw new ApiError(401,"Unauthorized Access")
+  }
+  try {
+    const decodedInfo= jwt.verify(token,process.env.REFRESH_TOKEN_SECRET)
+    if(!decodedInfo?._id){
+      throw new ApiError(401,"Invalid token");
+    }
+    const user=await User.findById(decodedInfo._id);
+    if(!user || user.refreshToken !== token){
+      throw new ApiError(401,"Invalid token")
+    }
+
+    const {accessToken,refreshToken}= await generateAccessAndRefreshTokens(user._id);
+
+    res.status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(new ApiResponse(200,{
+      refreshToken
+    },"Token refreshed successfully"))
+  } catch (error) {
+    throw new  ApiError(401,error?.message|| "Invalid refresh token")
+  }
+})
+export {registerUser, loginUser, logoutUser,getUserData,refreshToken}

@@ -9,7 +9,7 @@ function AuthLayout({children,authenticated}) {
 
   useEffect(()=>{
     // console.log(authenticated,user);
-    
+      if(loading) return;
     
       if(authenticated && !user) navigate('/login');
 

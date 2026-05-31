@@ -7,7 +7,7 @@ function Navbar() {
     const { user } = useAuth();
   return (
         
-            <div className=" justify-between w-5xl backdrop-blur-sm rounded-full border-white py-4 px-6 flex items-center ">
+            <div className=" justify-between w-xl md:w-5xl backdrop-blur-sm rounded-full border-white py-4 px-6 flex items-center ">
                 <NavLink to={'/'} className="font-extrabold text-white font-serif text-xl">shoW<span className=" text-red-400">Pic</span></NavLink>
                { !user && <div className="flex gap-2  "> 
                     <NavLink to={'/login'} className="px-6 py-3 rounded-full text-md hover:bg-gray-600/80 " >Login</NavLink>

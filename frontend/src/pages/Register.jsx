@@ -2,12 +2,13 @@ import React from "react";
 
 import { Link } from "react-router-dom";
 import Input from "../components/input";
-
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useAuth from "../hooks/useAuth.js";
 import Loading from "../components/Loading.jsx";
 function Register() {
   const { handleRegister, loading } = useAuth();
+  const navigate=useNavigate();
   const {
     register,
     handleSubmit,
@@ -16,7 +17,9 @@ function Register() {
   } = useForm();
   const createUser = async (data) => {
     await handleRegister(data);
+
     reset();
+    navigate('/')
   };
 
   if (loading) {

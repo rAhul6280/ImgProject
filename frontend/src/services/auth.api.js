@@ -1,10 +1,7 @@
-import axios from "axios";
+import api from "../api/axios.js";
 import { toast } from "react-toastify";
 
-const api = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
-  withCredentials: true,
-});
+
 
 export const register = async (formData) => {
   try {
