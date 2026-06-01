@@ -28,7 +28,6 @@ function Login() {
     if (!isValid) return;
     await handleLogin(form);
     setForm({ email: "", password: "" });
-    navigate("/");
   };
 
     if (loading) {

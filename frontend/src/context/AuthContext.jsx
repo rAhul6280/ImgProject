@@ -19,10 +19,8 @@ export const AuthContextProvider = ({ children }) => {
     try {
       setLoading(true);
       // Add 5 second timeout to prevent infinite loops
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timeout")), 5000)
-      );
-      const data = await Promise.race([fetchUserData(), timeoutPromise]);
+     
+      const data = await fetchUserData();
       setUser(data);
     } catch(err){
       console.log("Failed to fetch user:", err.message);
@@ -40,6 +38,7 @@ export const AuthContextProvider = ({ children }) => {
         setUser(data);
       }
     } catch (error) {
+      setUser(null);
       console.log(error);
     } finally {
       setLoading(false);
@@ -50,10 +49,11 @@ export const AuthContextProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await login(form);
-      if (data) {
+    
         setUser(data);
-      }
+      
     } catch (error) {
+      
       console.log(error);
     } finally {
       setLoading(false);
