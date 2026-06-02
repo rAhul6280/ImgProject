@@ -1,8 +1,9 @@
 import axios from "axios";
 import authEvents from "./authEvents.js";
 
+const backendURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: `${backendURL}/api/v1`,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
